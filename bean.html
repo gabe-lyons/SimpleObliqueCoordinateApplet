@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+
+	 <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+
+</head>
+
+<body>
+
+Brian Likes Obscure Coordinate Systems - The Game! (Minus the fun...) <br> <br>
+
+<! input fields for the axis vectors>
+X Axis: {<input type="text" value="1" id="v_ax" size="4" onchange="axisChange()" onkeyup="axisChange()"> , <input type="text" value="0" id="v_bx" size="4" onchange="axisChange()" onkeyup="axisChange()"> }<br>
+
+Y Axis: {<input type="text" value="0" id="v_ay" size="4" onchange="axisChange()" onkeyup="axisChange()"> , <input type="text" value="1" id="v_by" size="4" onchange="axisChange()" onkeyup="axisChange()"> }<br>
+
+Add Point: {<input type="text" value="1" id="p_x" size="4">, <input type="text" value="1" id="p_y" size="4">}   <input type="button" id="addPoint" onclick="addPoint()" value="Add!"> <br><br>
+
+<canvas id="myCanvas" width="400" height="400"></canvas><br>
+
+<input type="button" onclick="clearPoints()" value="Clear">
+
+<script>
+
+var pointList = [];
+var canvas = document.getElementById('myCanvas');
+var context = canvas.getContext('2d');
+
+//called to clear all points
+function clearPoints() {
+	pointList = [];
+	axisChange();
+}
+
+//called when a new point is submitted
+function addPoint() {
+	if(document.getElementById("p_x").value != "" && document.getElementById("p_y").value != "") {
+		pointList.push([parseInt(document.getElementById("p_x").value), parseInt(document.getElementById("p_y").value)]);
+		document.getElementById("p_x").value = "0";
+		document.getElementById("p_y").value = "0";
+	}
+	axisChange();
+}
+
+//called when the axis' vectors change, redraws the whole get-up
+function axisChange() {
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.beginPath();
+	// calculates xAxis starting and ending points
+	var xRise = document.getElementById("v_bx").value;
+	var xRun = document.getElementById("v_ax").value;
+	// sanatizes against 0s
+	if(xRise == 0) xRise = .000000000001;
+	if(xRun == 0) xRun = .000000000001;
+
+	// calculates which side of the canvas the line will originate from
+	if(xRise / xRun > 1) {
+		var xShift = (200 / xRise) * xRun;
+		context.moveTo(200+xShift, 0);
+		context.lineTo(200-xShift, 400);
+		context.stroke();
+	} else {
+		var yShift = (200 / xRun) * xRise;
+		context.moveTo(0, 200+yShift);
+		context.lineTo(400, 200-yShift);
+		context.stroke();
+	}
+
+	// calculates yAxis starting and ending points
+	var yRise = document.getElementById("v_by").value;
+	var yRun = document.getElementById("v_ay").value;
+	// sanatizes against 0s
+	if(yRise == 0) yRise = .000000000001;
+	if(yRun == 0) yRun = .000000000001;
+
+	// calculates which side of the canvas the line will originate from
+	if(yRise / yRun > 1) {
+		var xShift = (200 / yRise) * yRun;
+		context.moveTo(200+xShift, 0);
+		context.lineTo(200-xShift, 400);
+		context.stroke();
+	} else {
+		var yShift = (200 / yRun) * yRise;
+		context.moveTo(0, 200+yShift);
+		context.lineTo(400, 200-yShift);
+		context.stroke();
+	}
+	var xLength = Math.sqrt(xRun * xRun + xRise * xRise);
+	var yLength = Math.sqrt(yRun* yRun + yRise * yRise);
+	//sanatizes for zeros
+	if(xLength == 0) xLength = 1;
+	if(yLength == 0) yLength = 1;
+	for (var i = 0; i < pointList.length; i++) {
+		context.fillStyle = "black";
+		context.fillRect(198 + ((pointList[i][0]*xRun)/xLength) + ((pointList[i][1]*yRun)/yLength), 198 - ((pointList[i][0]*xRise)/xLength) - ((pointList[i][1]*yRise)/yLength),5,5);
+	};
+}
+
+axisChange();
+
+</script>
+
+</body>
+
+</html>
